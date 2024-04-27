@@ -3,10 +3,11 @@ import { ref, reactive } from "vue";
 import Prosupuesto from "./components/Prosupuesto.vue";
 import ControlPresupuesto from "./components/ControlPresupuesto.vue";
 import iconNuevoGasto from "@/assets/img/add.svg" ;
+import Modal from "./components/Modal.vue";
 //ventana modal
 const modal = reactive({
   mostrar:false,
-  animar:false,
+  animar:false,//tendra una animancion
 })
 
 // Segundo presupuesto
@@ -19,6 +20,28 @@ const definirPresupuesto = (cantidad: number) => {
   presupuesto.value = cantidad;
   disponible.value = cantidad;
 };
+
+const mostrarModal = () => {
+  // Modificar modal
+  modal.mostrar = true;
+  setTimeout(()=>{
+    modal.animar = true;
+
+  },300)
+
+};
+//quiero cerrar el Modal  2.0
+//animacion 2.0
+const ocultarModal = () => {
+  // Modificar modal
+
+  modal.animar = false;
+  setTimeout(()=>{
+    modal.mostrar = false;
+
+  },300)
+};
+
 </script>
 
 
@@ -47,12 +70,21 @@ const definirPresupuesto = (cantidad: number) => {
 
 
   <!--renderizando iconNuevoGasto -->
+  <!----->
 <img
 :src="iconNuevoGasto"  
 alt="icono nuevo gasto"
-class=""
+@click="mostrarModal"
+
 >
 </div>
+<!----2.1 @ocultar-modal="ocultarModal"-->
+<!----3.1 pasando info actualizaciones pasen al componente"-->
+<Modal
+v-if="modal.mostrar"
+@ocultar-modal="ocultarModal"
+:modal="modal"
+/>
 </main>
 
 
