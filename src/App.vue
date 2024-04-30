@@ -9,6 +9,16 @@ const modal = reactive({
   mostrar:false,
   animar:false,//tendra una animancion
 })
+//state de gasto
+const gasto = reactive({
+  nombre:"",
+  cantidad:"",
+  categoria:"",
+  id: null,
+  fecha:Date.now//fecha en que se realiza el gasto
+  //->pasar todo al formulario
+
+});
 
 // Segundo presupuesto
 const presupuesto = ref(0);
@@ -41,6 +51,12 @@ const ocultarModal = () => {
 
   },300)
 };
+
+const guardarGastos =()=>{
+    console.log('desde app.vue')
+    console.log(gasto);
+    
+  }
 
 </script>
 
@@ -83,7 +99,11 @@ alt="icono nuevo gasto"
 <Modal
 v-if="modal.mostrar"
 @ocultar-modal="ocultarModal"
+@guardar-gastos="guardarGastos"
 :modal="modal"
+v-model:nombre="gasto.nombre"
+v-model:cantidad="gasto.cantidad"
+v-model:categoria="gasto.categoria"
 />
 </main>
 

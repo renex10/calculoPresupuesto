@@ -1,61 +1,118 @@
 <script lang="ts" setup>
-//2.2
-import { defineEmits } from "vue";
-import { defineProps } from "vue";
-
-//importar imagen desde asset/img
+import { defineProps, defineEmits } from "vue";
+// Importar componente Alerta
+import Alerta from "./Alerta.vue";
+import { ref } from "vue";
+// Importar imagen desde asset/img
 import cerrarModal from "@/assets/img/cerrar.svg";
-//registrando el emit de la funcion cerrar modal
+import { emit } from "process";
 
-//2.3
-const emits = defineEmits(["ocultar-modal"]);
+const error = ref("");
+
+// Definir emisiones
+const emits = defineEmits([
+  "ocultar-modal",
+  "guardar-gastos",
+  "update:nombre",
+  "update:cantidad",
+  "update:categoria",
+]);
+
+// Definir propiedades
 const props = defineProps({
   modal: {
     type: Object,
     required: true,
   },
+  nombre: {
+    type: String,
+    required: true,
+  },
+  cantidad: {
+    type: [String, Number],
+    required: true,
+  },
+  categoria: {
+    type: String,
+    required: true,
+  },
 });
+
+const agregarGasto = () => {
+  // Validar que no hayan campos vacíos
+  const { cantidad, categoria, nombre } = props;
+  if (!cantidad || !categoria || !nombre) {
+    error.value = "Todos los campos son obligatorios";
+    // Después de unos segundos, limpiar el error
+    setTimeout(() => {
+      error.value = "";
+    }, 3000);
+    return;
+  }
+  
+  // Aquí puedes agregar la lógica adicional para agregar el gasto
+
+  if (cantidad <= 0) {
+    error.value = "Cantidad no válida";
+    // Después de unos segundos, limpiar el error
+    setTimeout(() => {
+      error.value = "";
+    }, 3000);
+    return;
+  }
+
+  emits('guardar-gastos'); // Emitir el evento 'guardar-gastos'
+
+};
 </script>
 
 <template>
-  <!---2.4 @click="$emit('ocultar-modal')"/>-->
   <div class="modal">
     <div class="cerrar-modal">
       <img :src="cerrarModal" @click="$emit('ocultar-modal')" />
     </div>
 
-    <!---agregando contenido al modal-->
-    <!---todo el formulario sin action-->
     <div
       class="contenedor contenedor-formulario"
-      :class="{ 'animar': modal.animar, 'cerrar': !modal.mostrar }"
+      :class="{ animar: modal.animar, cerrar: !modal.mostrar }"
     >
-      <form class="nuevo-gasto">
+      <form class="nuevo-gasto" @submit.prevent="agregarGasto">
         <legend>Añade Gasto</legend>
+        <Alerta v-if="error">{{ error }}</Alerta>
         <div class="campo">
           <label for="nombre">Nombre del gasto</label>
-          <input type="text" id="nombre" placeholder="añade tu gasto" />
+          <input
+            type="text"
+            id="nombre"
+            placeholder="Añade tu gasto"
+            :value="nombre"
+            @input="$emit('update:nombre', $event.target.value)"
+          />
         </div>
-
         <div class="campo">
           <label for="cantidad">Cantidad</label>
           <input
             type="number"
             id="cantidad"
-            placeholder="añade la cantidad del gasto. ej.500"
+            placeholder="Añade la cantidad del gasto"
+            :value="cantidad"
+            @input="$emit('update:cantidad', $event.target.value)"
           />
         </div>
-
         <div class="campo">
-          <label for="cantidad">Categoria</label>
-          <select name="" id="categoria">
-            <option value="comida">comida</option>
-            <option value="ahorro">ahorro</option>
-            <option value="casa">casa</option>
-            <option value="ocio">ocio</option>
-            <option value="suscripciones">suscripciones</option>
-            <option value="salud">salud</option>
-            <option value="alcohol">alcohol</option>
+          <label for="categoria">Categoría</label>
+          <select
+            id="categoria"
+            :value="categoria"
+            @input="$emit('update:categoria', $event.target.value)"
+          >
+            <option value="comida">Comida</option>
+            <option value="ahorro">Ahorro</option>
+            <option value="casa">Casa</option>
+            <option value="ocio">Ocio</option>
+            <option value="suscripciones">Suscripciones</option>
+            <option value="salud">Salud</option>
+            <option value="alcohol">Alcohol</option>
           </select>
         </div>
         <input type="submit" value="Añadir Gasto" />
@@ -82,7 +139,6 @@ const props = defineProps({
 }
 
 .contenedor-formulario {
-
   transition-property: all;
   transition-duration: 300ms;
   transition-timing-function: ease-in;
